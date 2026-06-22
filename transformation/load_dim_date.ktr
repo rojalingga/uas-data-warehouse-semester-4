@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>load_dim_customer</name>
+    <name>load_dim_date</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -426,10 +426,10 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2026/06/08 10:38:03.659</created_date>
+    <created_date>2026/06/20 23:28:33.478</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2026/06/08 10:38:03.659</modified_date>
-    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
+    <modified_date>2026/06/20 23:28:33.478</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -442,6 +442,26 @@
     </hop>
     <hop>
       <from>Select values</from>
+      <to>Calculator</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Calculator</from>
+      <to>Modified JavaScript value</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Modified JavaScript value</from>
+      <to>Sort rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Sort rows</from>
+      <to>Unique rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Unique rows</from>
       <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
@@ -457,7 +477,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/olist_customers_dataset.csv</filename>
+    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/olist_orders_dataset.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -473,6 +493,17 @@
     <encoding/>
     <fields>
       <field>
+        <name>order_id</name>
+        <type>String</type>
+        <format/>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
         <name>customer_id</name>
         <type>String</type>
         <format/>
@@ -484,46 +515,68 @@
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>customer_unique_id</name>
+        <name>order_status</name>
         <type>String</type>
         <format/>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>32</length>
+        <length>9</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>customer_zip_code_prefix</name>
-        <type>Integer</type>
-        <format>#</format>
+        <name>order_purchase_timestamp</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>customer_city</name>
-        <type>String</type>
-        <format/>
-        <currency>IDR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>23</length>
+        <length>-1</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>customer_state</name>
-        <type>String</type>
-        <format/>
+        <name>order_approved_at</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>2</length>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_delivered_carrier_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_delivered_customer_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_estimated_delivery_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
@@ -537,8 +590,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
-      <yloc>112</yloc>
+      <xloc>80</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -555,18 +608,27 @@
     </partitioning>
     <fields>
       <field>
-        <name>customer_id</name>
-      </field>
-      <field>
-        <name>customer_unique_id</name>
-      </field>
-      <field>
-        <name>customer_city</name>
-      </field>
-      <field>
-        <name>customer_state</name>
+        <name>order_purchase_timestamp</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
+      <meta>
+        <name>order_purchase_timestamp</name>
+        <rename>full_date</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy-MM-dd HH:mm:ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -577,8 +639,236 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
-      <yloc>112</yloc>
+      <xloc>208</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Calculator</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <failIfNoFile>Y</failIfNoFile>
+    <calculation>
+      <field_name>day_num</field_name>
+      <calc_type>DAY_OF_MONTH</calc_type>
+      <field_a>full_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>None</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>month_num</field_name>
+      <calc_type>MONTH_OF_DATE</calc_type>
+      <field_a>full_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>None</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>year_num</field_name>
+      <calc_type>YEAR_OF_DATE</calc_type>
+      <field_a>full_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>None</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>320</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Modified JavaScript value</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>//Script here
+date_key =
+(year_num * 10000) +
+(month_num * 100) +
+day_num;
+
+quarter_num = Math.ceil(month_num / 3);
+
+if(month_num == 1) month_name = "January";
+else if(month_num == 2) month_name = "February";
+else if(month_num == 3) month_name = "March";
+else if(month_num == 4) month_name = "April";
+else if(month_num == 5) month_name = "May";
+else if(month_num == 6) month_name = "June";
+else if(month_num == 7) month_name = "July";
+else if(month_num == 8) month_name = "August";
+else if(month_num == 9) month_name = "September";
+else if(month_num == 10) month_name = "October";
+else if(month_num == 11) month_name = "November";
+else month_name = "December";
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>date_key</name>
+        <rename>date_key</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>quarter_num</name>
+        <rename>quarter_num</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>month_name</name>
+        <rename>month_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>464</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>date_key</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Unique rows</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <count_field/>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <error_description/>
+    <fields>
+      <field>
+        <name>date_key</name>
+        <case_insensitive>N</case_insensitive>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>736</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -595,9 +885,9 @@
     </partitioning>
     <connection>DW_OLIST</connection>
     <schema/>
-    <table>dim_customer</table>
+    <table>dim_date</table>
     <commit>1000</commit>
-    <truncate>N</truncate>
+    <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
     <specify_fields>Y</specify_fields>
@@ -612,20 +902,32 @@
     <return_field/>
     <fields>
       <field>
-        <column_name>customer_id</column_name>
-        <stream_name>customer_id</stream_name>
+        <column_name>full_date</column_name>
+        <stream_name>full_date</stream_name>
       </field>
       <field>
-        <column_name>customer_unique_id</column_name>
-        <stream_name>customer_unique_id</stream_name>
+        <column_name>day_num</column_name>
+        <stream_name>day_num</stream_name>
       </field>
       <field>
-        <column_name>customer_city</column_name>
-        <stream_name>customer_city</stream_name>
+        <column_name>month_num</column_name>
+        <stream_name>month_num</stream_name>
       </field>
       <field>
-        <column_name>customer_state</column_name>
-        <stream_name>customer_state</stream_name>
+        <column_name>year_num</column_name>
+        <stream_name>year_num</stream_name>
+      </field>
+      <field>
+        <column_name>date_key</column_name>
+        <stream_name>date_key</stream_name>
+      </field>
+      <field>
+        <column_name>quarter_num</column_name>
+        <stream_name>quarter_num</stream_name>
+      </field>
+      <field>
+        <column_name>month_name</column_name>
+        <stream_name>month_name</stream_name>
       </field>
     </fields>
     <attributes/>
@@ -637,8 +939,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>480</xloc>
-      <yloc>112</yloc>
+      <xloc>848</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

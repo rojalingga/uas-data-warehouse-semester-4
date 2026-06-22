@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>load_dim_product</name>
+    <name>Load_Fact_Sales</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
     </parameters>
@@ -426,9 +427,9 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2026/06/08 11:27:20.568</created_date>
+    <created_date>2026/06/21 02:29:55.751</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2026/06/08 11:27:20.568</modified_date>
+    <modified_date>2026/06/21 02:29:55.751</modified_date>
     <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
@@ -436,23 +437,53 @@
   </notepads>
   <order>
     <hop>
-      <from>CSV_PRODUCTS</from>
-      <to>SORT_PRODUCTS</to>
+      <from>CSV_ORDER_ITEMS</from>
+      <to>SORT_ITEMS</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>CSV_CATEGORY</from>
-      <to>SORT_CATEGORY</to>
+      <from>CSV_ORDERS</from>
+      <to>SORT_ORDERS</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>SORT_PRODUCTS</from>
+      <from>SORT_ITEMS</from>
       <to>Merge join</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>SORT_CATEGORY</from>
+      <from>SORT_ORDERS</from>
       <to>Merge join</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Merge join</from>
+      <to>Database lookup Customer</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database lookup Customer</from>
+      <to>Database Lookup Product</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database Lookup Product</from>
+      <to>Database Lookup Seller</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database Lookup Seller</from>
+      <to>JS_DATE_KEY</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>JS_DATE_KEY</from>
+      <to>JS_TOTAL_SALES</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>JS_TOTAL_SALES</from>
+      <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -460,19 +491,9 @@
       <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
-    <hop>
-      <from>Merge join</from>
-      <to>If field value is null</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>If field value is null</from>
-      <to>Select values</to>
-      <enabled>Y</enabled>
-    </hop>
   </order>
   <step>
-    <name>CSV_CATEGORY</name>
+    <name>CSV_ORDER_ITEMS</name>
     <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -482,7 +503,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/product_category_name_translation.csv</filename>
+    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/olist_order_items_dataset.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -498,68 +519,27 @@
     <encoding/>
     <fields>
       <field>
-        <name>﻿product_category_name</name>
+        <name>order_id</name>
         <type>String</type>
         <format/>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>46</length>
+        <length>32</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_category_name_english</name>
-        <type>String</type>
-        <format/>
+        <name>order_item_id</name>
+        <type>Integer</type>
+        <format>#</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>39</length>
-        <precision>-1</precision>
+        <length>15</length>
+        <precision>0</precision>
         <trim_type>none</trim_type>
       </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>128</xloc>
-      <yloc>256</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>CSV_PRODUCTS</name>
-    <type>CsvInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/olist_products_dataset.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>,</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
-    <fields>
       <field>
         <name>product_id</name>
         <type>String</type>
@@ -572,91 +552,47 @@
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_category_name</name>
+        <name>seller_id</name>
         <type>String</type>
         <format/>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>33</length>
+        <length>32</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_name_lenght</name>
-        <type>Integer</type>
-        <format>#</format>
+        <name>shipping_limit_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
+        <length>-1</length>
+        <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_description_lenght</name>
-        <type>Integer</type>
-        <format>#</format>
+        <name>price</name>
+        <type>BigNumber</type>
+        <format>#.##</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
+        <length>6</length>
+        <precision>2</precision>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_photos_qty</name>
-        <type>Integer</type>
-        <format>#</format>
+        <name>freight_value</name>
+        <type>BigNumber</type>
+        <format>#.##</format>
         <currency>IDR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>product_weight_g</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>IDR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>product_length_cm</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>IDR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>product_height_cm</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>IDR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>product_width_cm</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>IDR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
+        <length>5</length>
+        <precision>2</precision>
         <trim_type>none</trim_type>
       </field>
     </fields>
@@ -669,14 +605,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>128</xloc>
-      <yloc>128</yloc>
+      <xloc>144</xloc>
+      <yloc>160</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>If field value is null</name>
-    <type>IfNull</type>
+    <name>CSV_ORDERS</name>
+    <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -685,49 +621,108 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <replaceAllByValue/>
-    <replaceAllMask/>
-    <selectFields>Y</selectFields>
-    <selectValuesType>N</selectValuesType>
-    <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
+    <filename>${Internal.Entry.Current.Directory}/uas-data-warehouse-semester-4-main/dataset/olist_orders_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
     <fields>
       <field>
-        <name>product_weight_g</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>order_id</name>
+        <type>String</type>
+        <format/>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_length_cm</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>customer_id</name>
+        <type>String</type>
+        <format/>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_height_cm</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>order_status</name>
+        <type>String</type>
+        <format/>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>9</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_width_cm</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>order_purchase_timestamp</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
       <field>
-        <name>﻿product_category_name</name>
-        <value>unknown</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>order_approved_at</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
       <field>
-        <name>product_category_name_english</name>
-        <value>unknown</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
+        <name>order_delivered_carrier_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_delivered_customer_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>order_estimated_delivery_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>IDR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
     </fields>
     <attributes/>
@@ -739,8 +734,92 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
-      <yloc>208</yloc>
+      <xloc>144</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>SORT_ITEMS</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>order_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>304</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>SORT_ORDERS</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>order_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>304</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -756,13 +835,13 @@
       <schema_name/>
     </partitioning>
     <join_type>LEFT OUTER</join_type>
-    <step1>SORT_PRODUCTS</step1>
-    <step2>SORT_CATEGORY</step2>
+    <step1>SORT_ITEMS</step1>
+    <step2>SORT_ORDERS</step2>
     <keys_1>
-      <key>product_category_name</key>
+      <key>order_id</key>
     </keys_1>
     <keys_2>
-      <key>﻿product_category_name</key>
+      <key>order_id</key>
     </keys_2>
     <attributes/>
     <cluster_schema/>
@@ -773,14 +852,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>480</xloc>
-      <yloc>208</yloc>
+      <xloc>416</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>SORT_CATEGORY</name>
-    <type>SortRows</type>
+    <name>Database lookup Customer</name>
+    <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -789,31 +868,29 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>﻿product_category_name</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_category_name_english</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-    </fields>
+    <connection>DW_OLIST</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_customer</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>customer_id</name>
+        <field>customer_id</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>customer_key</name>
+        <rename>customer_key</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+    </lookup>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -823,14 +900,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
-      <yloc>256</yloc>
+      <xloc>560</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>SORT_PRODUCTS</name>
-    <type>SortRows</type>
+    <name>Database Lookup Product</name>
+    <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -839,85 +916,140 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
+    <connection>DW_OLIST</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_product</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
         <name>product_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
+        <field>product_id</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>product_key</name>
+        <rename>product_key</rename>
+        <default/>
+        <type>None</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>752</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Database Lookup Seller</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>DW_OLIST</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_seller</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>seller_id</name>
+        <field>seller_id</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>seller_key</name>
+        <rename>seller_key</rename>
+        <default/>
+        <type>None</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>928</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>JS_DATE_KEY</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var s = order_purchase_timestamp.toString();
+
+var year  = s.substring(24,28);
+var monthTxt = s.substring(4,7);
+var day   = s.substring(8,10);
+
+var month = "01";
+
+if(monthTxt=="Jan") month="01";
+if(monthTxt=="Feb") month="02";
+if(monthTxt=="Mar") month="03";
+if(monthTxt=="Apr") month="04";
+if(monthTxt=="May") month="05";
+if(monthTxt=="Jun") month="06";
+if(monthTxt=="Jul") month="07";
+if(monthTxt=="Aug") month="08";
+if(monthTxt=="Sep") month="09";
+if(monthTxt=="Oct") month="10";
+if(monthTxt=="Nov") month="11";
+if(monthTxt=="Dec") month="12";
+
+date_key = parseInt(year + month + day);</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
       <field>
-        <name>product_category_name</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_name_lenght</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_description_lenght</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_photos_qty</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_weight_g</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_length_cm</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_height_cm</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>product_width_cm</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
+        <name>date_key</name>
+        <rename>date_key</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>
     </fields>
     <attributes/>
@@ -929,8 +1061,55 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
-      <yloc>128</yloc>
+      <xloc>1104</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>JS_TOTAL_SALES</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>total_sales =
+Number(price)
++
+Number(freight_value);</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>total_sales</name>
+        <rename>total_sales</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1232</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -947,25 +1126,32 @@
     </partitioning>
     <fields>
       <field>
-        <name>product_id</name>
+        <name>price</name>
+        <rename/>
       </field>
       <field>
-        <name>product_weight_g</name>
+        <name>freight_value</name>
+        <rename/>
       </field>
       <field>
-        <name>product_length_cm</name>
+        <name>customer_key</name>
+        <rename/>
       </field>
       <field>
-        <name>product_height_cm</name>
+        <name>product_key</name>
+        <rename/>
       </field>
       <field>
-        <name>product_width_cm</name>
+        <name>seller_key</name>
+        <rename/>
       </field>
       <field>
-        <name>﻿product_category_name</name>
+        <name>date_key</name>
+        <rename/>
       </field>
       <field>
-        <name>product_category_name_english</name>
+        <name>total_sales</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -978,8 +1164,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>736</xloc>
-      <yloc>208</yloc>
+      <xloc>1360</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -995,10 +1181,10 @@
       <schema_name/>
     </partitioning>
     <connection>DW_OLIST</connection>
-    <schema>dw_olist</schema>
-    <table>dim_product</table>
+    <schema/>
+    <table>fact_sales</table>
     <commit>1000</commit>
-    <truncate>N</truncate>
+    <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
     <specify_fields>Y</specify_fields>
@@ -1013,32 +1199,32 @@
     <return_field/>
     <fields>
       <field>
-        <column_name>product_id</column_name>
-        <stream_name>product_id</stream_name>
+        <column_name>price</column_name>
+        <stream_name>price</stream_name>
       </field>
       <field>
-        <column_name>product_category_name</column_name>
-        <stream_name>﻿product_category_name</stream_name>
+        <column_name>freight_value</column_name>
+        <stream_name>freight_value</stream_name>
       </field>
       <field>
-        <column_name>product_category_name_english</column_name>
-        <stream_name>product_category_name_english</stream_name>
+        <column_name>customer_key</column_name>
+        <stream_name>customer_key</stream_name>
       </field>
       <field>
-        <column_name>product_weight_g</column_name>
-        <stream_name>product_weight_g</stream_name>
+        <column_name>product_key</column_name>
+        <stream_name>product_key</stream_name>
       </field>
       <field>
-        <column_name>product_length_cm</column_name>
-        <stream_name>product_length_cm</stream_name>
+        <column_name>seller_key</column_name>
+        <stream_name>seller_key</stream_name>
       </field>
       <field>
-        <column_name>product_height_cm</column_name>
-        <stream_name>product_height_cm</stream_name>
+        <column_name>date_key</column_name>
+        <stream_name>date_key</stream_name>
       </field>
       <field>
-        <column_name>product_width_cm</column_name>
-        <stream_name>product_width_cm</stream_name>
+        <column_name>total_sales</column_name>
+        <stream_name>total_sales</stream_name>
       </field>
     </fields>
     <attributes/>
@@ -1050,8 +1236,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>848</xloc>
-      <yloc>208</yloc>
+      <xloc>1360</xloc>
+      <yloc>352</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
